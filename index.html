@@ -173,6 +173,7 @@
       <input
         type="tel"
         id="phone"
+        name="phone"
         placeholder="+1 (555) 000-0000"
         autocomplete="tel"
       />
@@ -226,9 +227,34 @@
     phoneInput.addEventListener('input', validate);
     consentBox.addEventListener('change', validate);
 
-    submitBtn.addEventListener('click', () => {
-      formView.style.display = 'none';
-      successView.style.display = 'block';
+    submitBtn.addEventListener('click', async () => {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      const data = new FormData();
+      data.append('phone', phoneInput.value);
+      data.append('consent', 'true');
+
+      try {
+        const res = await fetch('https://formspree.io/f/xgorqygk', {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          formView.style.display = 'none';
+          successView.style.display = 'block';
+        } else {
+          submitBtn.textContent = 'Opt In';
+          submitBtn.disabled = false;
+          alert('Something went wrong. Please try again.');
+        }
+      } catch (e) {
+        submitBtn.textContent = 'Opt In';
+        submitBtn.disabled = false;
+        alert('Something went wrong. Please try again.');
+      }
     });
   </script>
 </body>
